@@ -1,13 +1,10 @@
-jQuery(window).ready(function(){
-	if(!WHICHBROWSER.isSafari && !WHICHBROWSER.isMobile()){
-		document.onmousewheel = function(){
-			customSmoothScroll();
-		};
-
-		if(document.addEventListener){
-			document.addEventListener('DOMMouseScroll', customSmoothScroll, false);
-		}
-	}
+var smoothScroll = function(){
+	this.start = function(){
+		if(window.addEventListener) {
+	        var eventType = (navigator.userAgent.indexOf('Firefox') !=-1) ? "DOMMouseScroll" : "mousewheel";            
+	        window.addEventListener(eventType, this.customSmoothScroll, false);
+	    }
+	};
 
 	function customSmoothScroll(event){
 		if(!WHICHBROWSER.isSafari && !WHICHBROWSER.isMobile()){
@@ -31,4 +28,4 @@ jQuery(window).ready(function(){
 			event.returnValue = false;
 		}
 	}
-});
+};

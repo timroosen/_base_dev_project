@@ -1,39 +1,47 @@
-var ajaxHandler = function(parentClass){
-	var base = this;
-	var parent = parentClass;
+/*-------- START USAGE --------/*
+
+	//example prarams to post//
+	postParams = {};
+	postParams.action = 'get_overlay';
+	postParams.type = target;			--> Get object data with this target
+	postParams.id = id;
+
+	var _ajaxhandler = new ajaxHandler(baseclass or this);
+	_ajaxhandler.addEventListener(callbackfunction);
+	_ajaxhandler.getData(postParams);
+
+	function callbackfunction(data){
+		date = data returned from this.getData(dataObject)
+	}
+
+/*-------- END USAGE --------*/
+var ajaxHandler = function(baseClass){
+	var parent = baseClass;
 	var responseObject = new Object({});
-	var pageDataCompleteEvent = document.createEvent('Event');
-	var $ = jQuery;
+	var dataCompleteEvent = document.createEvent('Event');
 	var callBack;
 	var lastPageCalled;
-	
-	this.init = function(){
-		pageDataCompleteEvent.initEvent('ajax_page_call', true, true);
-	};
 
-	this.getPage = function(params){
+	//PUBLIC FUNCTIONS
+	this.getData = function(params){
 		lastPageCalled = params.target;
 		if(responseObject[params.target]){ //DATA IS ALREADY LOADED
-			document.dispatchEvent(pageDataCompleteEvent);
-			document.removeEventListener('ajax_page_call', callBack, false);
-		}else{ // NEW DATA REQUEST
+			document.dispatchEvent(dataCompleteEvent);
+			document.removeEventListener('ajax_call', onCompleteCallback, false);
+		}else{ //NEW DATA REQUEST
 			call(params).done(function (data) {
 				responseObject[params.target] = data;
-				document.dispatchEvent(pageDataCompleteEvent);
-				document.removeEventListener('ajax_page_call', callBack, false);
+				document.dispatchEvent(dataCompleteEvent);
+				document.removeEventListener('ajax_call', onCompleteCallback, false);
 			}).fail(function() {
-				base.getPage(params);
+				this.getPage(params);
 			});
-		}
-
-		function call(params){
-			return $.post(localvars.ajaxurl, params);
 		}
 	};
 
-	this.getData = function(pagename){
+	this.getData = function(dataObject){
 		if(pagename !== undefined){
-			return responseObject[pagename];
+			return responseObject[dataObject];
 		}else{
 			return responseObject[lastPageCalled];
 		}
@@ -42,13 +50,26 @@ var ajaxHandler = function(parentClass){
 	this.addEventListener = function(callback){
 		if (callback !== undefined){
 			callBack = callback;
-			document.addEventListener('ajax_page_call', callBack, false);
+			document.addEventListener('ajax_call', onCompleteCallback, false);
 		}
 	};
 
-	this.preFillPage = function(pagename, pagedata){
-		responseObject[pagename] = pagedata;
+	this.preFillPage = function(dataObject, pagedata){
+		responseObject[dataObject] = pagedata;
 	};
 
-	this.init();
+	//PRIVATE FUNCTIONS
+	function init(){
+		dataCompleteEvent.initEvent('ajax_call', true, true);
+	}
+
+	function onCompleteCallback(){
+		callback(this.getData);
+	}
+
+	function call(params){
+		return $.post(localvars.ajaxurl, params);
+	}
+
+	init();
 };
