@@ -4,7 +4,7 @@ var $ = jQuery;
 /* ON PAGE LOAD */
 (function($){
 	$(window).resize(function() {
-		BASE.main.resize();
+		
 	});		
 	$(window).load(function(){	
 		this.mousehandler = new mouseHandler(); //Handels mouseevents		
